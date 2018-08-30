@@ -7,7 +7,4 @@ public interface OpenCommand {
     String[] getAliases();
 
     String getDescription();
-
-    String getShortDescription();
-
 }

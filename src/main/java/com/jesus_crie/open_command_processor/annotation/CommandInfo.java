@@ -4,5 +4,4 @@ public @interface CommandInfo {
 
     String[] aliases();
     String description() default "";
-    String shortDescription() default "";
 }
