@@ -12,5 +12,10 @@ repositories {
 }
 
 dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.12'
+    def junit = '5.3.1'
+
+    testCompile "org.junit.jupiter:junit-jupiter-api:$junit"
+    testCompile "org.junit.jupiter:junit-jupiter-params:$junit"
+    testCompile "org.junit.jupiter:junit-jupiter-engine:$junit"
+    testCompile 'org.hamcrest:java-hamcrest:2.0.0.0'
 }

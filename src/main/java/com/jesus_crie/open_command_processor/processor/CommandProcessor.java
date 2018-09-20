@@ -1,6 +1,7 @@
 package com.jesus_crie.open_command_processor.processor;
 
 import com.jesus_crie.open_command_processor.CommandContext;
+import com.jesus_crie.open_command_processor.CommandProcessingException;
 
 import java.util.regex.Pattern;
 
@@ -21,15 +22,22 @@ public class CommandProcessor {
         // First there must be the name of the command
 
 
-
         return null;
     }
 
     public String readWord(final Cursor cursor) {
+        final StringBuilder out = new StringBuilder();
+
         cursor.newEra();
         char c;
         while (cursor.hasNext()) {
             c = cursor.read();
+
+            if (c == ESCAPE_CHARACTER)
+                out.append(readEscapedCharacter(cursor));
+            else if (c == QUOTE_SINGLE || c == QUOTE_DOUBLE) {
+                // TODO 9/20/18 quoted string
+            }
             // TODO 31/08/18
         }
 
@@ -37,11 +45,33 @@ public class CommandProcessor {
         return null;
     }
 
+    public char readEscapedCharacter(final Cursor cursor) {
+        try {
+            return cursor.read();
+        } catch (StringIndexOutOfBoundsException e) {
+            throw new CommandProcessingException("Can't escape next character !, nothing left !", cursor.eraStart, cursor.position);
+        }
+    }
+
+    public String readQuotedString(final Cursor cursor, final char endChar) {
+        final StringBuilder out = new StringBuilder();
+
+        char c;
+        while ((c = cursor.read()) != endChar) {
+            if (c == ESCAPE_CHARACTER)
+                out.append(readEscapedCharacter(cursor));
+            else
+                out.append(c);
+        }
+
+        return out.toString();
+    }
+
     public Object suggest(final CommandContext context, final String input) {
         return null;
     }
 
-    private static class Cursor {
+    static class Cursor {
 
         private int position = -1;
         private int eraStart = 0;
@@ -70,6 +100,10 @@ public class CommandProcessor {
 
         public void newEra() {
             eraStart = position;
+        }
+
+        public int getEraStart() {
+            return eraStart;
         }
 
         public void reset() {
