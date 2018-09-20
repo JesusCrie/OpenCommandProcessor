@@ -7,6 +7,7 @@ import java.util.regex.Pattern;
 
 public class CommandProcessor {
 
+    private static final char SPACE_CHARACTER = ' ';
     private static final char ESCAPE_CHARACTER = '\\';
     private static final char QUOTE_SINGLE = '\'';
     private static final char QUOTE_DOUBLE = '"';
@@ -30,21 +31,33 @@ public class CommandProcessor {
 
         cursor.newEra();
         char c;
+
         while (cursor.hasNext()) {
             c = cursor.read();
 
-            if (c == ESCAPE_CHARACTER)
+            if (c == ESCAPE_CHARACTER) {
                 out.append(readEscapedCharacter(cursor));
-            else if (c == QUOTE_SINGLE || c == QUOTE_DOUBLE) {
-                // TODO 9/20/18 quoted string
+            } else if (c == SPACE_CHARACTER) {
+                return out.toString();
+            } else {
+                out.append(c);
             }
-            // TODO 31/08/18
         }
 
-
-        return null;
+        return out.toString();
     }
 
+    /**
+     * Read and return the next character, ignoring it's nature.
+     * Typically called for the character after the escape character (\).
+     * <p>
+     * Ex: "hey \" "
+     *           ^
+     *
+     * @param cursor The cursor.
+     * @return The next character.
+     * @throws CommandProcessingException If there is no character left to consume.
+     */
     public char readEscapedCharacter(final Cursor cursor) {
         try {
             return cursor.read();
@@ -53,15 +66,29 @@ public class CommandProcessor {
         }
     }
 
+    /**
+     * Read and return the string contained between 2 characters, typically a quoted string.
+     * <p>
+     * Ex: "hey 'dude'"
+     *      ^^^^^^^^^^
+     *
+     * @param cursor  The cursor.
+     * @param endChar The character denoting the end of the quote.
+     * @return The entire string before the closing quote.
+     */
     public String readQuotedString(final Cursor cursor, final char endChar) {
         final StringBuilder out = new StringBuilder();
 
         char c;
-        while ((c = cursor.read()) != endChar) {
-            if (c == ESCAPE_CHARACTER)
-                out.append(readEscapedCharacter(cursor));
-            else
-                out.append(c);
+        try {
+            while ((c = cursor.read()) != endChar) {
+                if (c == ESCAPE_CHARACTER)
+                    out.append(readEscapedCharacter(cursor));
+                else
+                    out.append(c);
+            }
+        } catch (StringIndexOutOfBoundsException e) {
+            throw new CommandProcessingException("Quote not closed !", cursor.eraStart, cursor.position);
         }
 
         return out.toString();
@@ -71,6 +98,9 @@ public class CommandProcessor {
         return null;
     }
 
+    /**
+     * A useful class to walk through a string step by step and eventually divide it in eras.
+     */
     static class Cursor {
 
         private int position = -1;
@@ -82,7 +112,7 @@ public class CommandProcessor {
         }
 
         public boolean hasNext() {
-            return position < payload.length();
+            return position < payload.length() - 1;
         }
 
         public char read() {
