@@ -15,6 +15,13 @@ public class CommandProcessor {
     private static final Pattern PATTERN_OPTION_ALLOWED = Pattern.compile("[a-zA-Z0-9-_]");
     private static final Pattern PATTERN_OPTION_SHORT_ALLOWED = Pattern.compile("[a-zA-Z0-9]");
 
+    /**
+     * Process the given command and return a result containing the full path and the options.
+     *
+     * @param context The context of the command.
+     * @param input   The input string (command typed by the user).
+     * @return A result containing the informations that have been parsed.
+     */
     public ProcessedResult process(final CommandContext context, final String input) {
         if (input == null || input.length() == 0)
             throw new IllegalArgumentException("The input string is empty !");
@@ -51,7 +58,7 @@ public class CommandProcessor {
             }
         }
 
-        return null;
+        return builder.build();
     }
 
     /**

@@ -1,9 +1,12 @@
 package com.jesus_crie.open_command_processor.processor;
 
+import com.jesus_crie.open_command_processor.CommandContext;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.*;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.ArgumentsProvider;
+import org.junit.jupiter.params.provider.ArgumentsSource;
 
 import java.util.stream.Stream;
 
@@ -37,13 +40,19 @@ class CommandProcessorTest {
         assertThat(quote, equalTo(expected));
     }
 
+    @ParameterizedTest
+    @ArgumentsSource(value = FullCommandProvider.class)
+    void test_fullParseALot(final String data, final String expectedName, final String[] expectedPath, final String[] expectedLOp, final Character[] expectedSOp) {
+        final ProcessedResult results = processor.process(new CommandContext())
+    }
+
     private static class WordProvider implements ArgumentsProvider {
 
         @Override
         public Stream<? extends Arguments> provideArguments(ExtensionContext context) throws Exception {
             return Stream.of(
-                   Arguments.of("hey ho", "hey"),
-                   Arguments.of("yo\\ ye", "yo ye")
+                    Arguments.of("hey ho", "hey"),
+                    Arguments.of("yo\\ ye", "yo ye")
             );
         }
     }
@@ -56,6 +65,20 @@ class CommandProcessorTest {
                     Arguments.of("\"hello \"", "hello "),
                     Arguments.of("'test ma cou\\'ille'", "test ma cou'ille"),
                     Arguments.of("\" hellow --hey \"", " hellow --hey ")
+            );
+        }
+    }
+
+    private static class FullCommandProvider implements ArgumentsProvider {
+
+        @Override
+        public Stream<? extends Arguments> provideArguments(ExtensionContext context) throws Exception {
+            return Stream.of(
+                    Arguments.of("test and some path",
+                            "test",
+                            new String[]{"and", "some", "path"},
+                            new String[0],
+                            new Character[0])
             );
         }
     }

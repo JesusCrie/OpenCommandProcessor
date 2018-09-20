@@ -5,15 +5,48 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-public abstract class ProcessedResult {
+public class ProcessedResult {
 
-    public abstract boolean isErrored();
+    private final String name;
+    private final String[] path;
+    private final String[] longOptions;
+    private final Character[] shortOptions;
+
+    private ProcessedResult(final String name, final String[] path, final String[] longOptions, final Character[] shortOptions) {
+        this.name = name;
+        this.path = path;
+        this.longOptions = longOptions;
+        this.shortOptions = shortOptions;
+    }
+
+    public void validateOption() {
+        // TODO 9/20/18 validate options and throw error if unknown or invalid option
+    }
+
+    public String[] getCompletePath() {
+        return path;
+    }
+
+    String[] getRawLOptions() {
+        return longOptions;
+    }
+
+    Character[] getRawSOptions() {
+        return shortOptions;
+    }
+
+    public boolean hasOption(Object todo) {
+        // TODO 9/20/18 create options object & check if present
+        return false;
+    }
+
+    /*public abstract boolean isErrored();
 
     public abstract boolean hasOption(String arg);
 
     public abstract boolean optionHasArgument(String arg);
 
-    public abstract String[] getCompletePath();
+    public abstract String[] getCompletePath();*/
 
     static class Builder {
 
@@ -40,6 +73,10 @@ public abstract class ProcessedResult {
         public Builder appendShortOption(final char op) {
             shortOptions.add(op);
             return this;
+        }
+
+        public ProcessedResult build() {
+            return new ProcessedResult(cmdName, path.toArray(new String[0]), options.toArray(new String[0]), shortOptions.toArray(new Character[0]));
         }
     }
 }

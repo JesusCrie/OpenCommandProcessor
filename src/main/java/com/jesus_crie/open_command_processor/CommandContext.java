@@ -6,6 +6,8 @@ import java.util.Map;
 
 public class CommandContext {
 
+    private static final CommandContext EMPTY = new CommandContext(null);
+
     public static CommandContext fromData(final Object[][] data) {
         return new CommandContext(Arrays.stream(data)
                 .collect(HashMap::new, (d, el) -> d.put((String) el[0], el[1]), HashMap::putAll));
@@ -16,6 +18,10 @@ public class CommandContext {
         final Map<String, Object> map = new HashMap<>();
         for (Pair<String, Object> pair : data) map.put(pair.getKey(), pair.getValue());
         return new CommandContext(map);
+    }
+
+    public static CommandContext empty() {
+        return EMPTY;
     }
 
     private final Map<String, Object> data;
