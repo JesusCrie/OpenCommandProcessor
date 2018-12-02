@@ -43,7 +43,8 @@ class CommandProcessorTest {
     @ParameterizedTest
     @ArgumentsSource(value = FullCommandProvider.class)
     void test_fullParseALot(final String data, final String expectedName, final String[] expectedPath, final String[] expectedLOp, final Character[] expectedSOp) {
-        final ProcessedResult results = processor.process(new CommandContext())
+        final ProcessedResult results = processor.process(CommandContext.empty(), data);
+        // TODO 9/20/18 test
     }
 
     private static class WordProvider implements ArgumentsProvider {
